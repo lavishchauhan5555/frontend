@@ -59,7 +59,7 @@ const Signup: React.FC = () => {
 
     try {
       // 1️⃣ Signup API
-      const res = await axios.post("http://localhost:3000/Auth/signup", {
+      const res = await axios.post("https://backend-96gl.onrender.com/Auth/signup", {
         username: data.fullName,
         email: data.email,
         password: data.password,
@@ -88,22 +88,22 @@ const Signup: React.FC = () => {
   // ---------------------------
   // VERIFY OTP API
   // ---------------------------
-  const handleVerifyOtp = async () => {
-    try {
-      const res = await axios.post("http://localhost:3000/Auth/otp", {
-        email: userEmail,
-        username:username,
-        otp: otp,
-        password:password,
-      });
+  // const handleVerifyOtp = async () => {
+  //   try {
+  //     const res = await axios.post("https://backend-96gl.onrender.com/Auth/otp", {
+  //       email: userEmail,
+  //       username:username,
+  //       otp: otp,
+  //       password:password,
+  //     });
 
-      alert("OTP Verified Successfully!");
-      setOtpPopup(false);
+  //     alert("OTP Verified Successfully!");
+  //     setOtpPopup(false);
 
-    } catch (error: any) {
-      alert(error.response?.data?.message || "Invalid OTP!");
-    }
-  };
+  //   } catch (error: any) {
+  //     alert(error.response?.data?.message || "Invalid OTP!");
+  //   }
+  // };
 
   return (
     <div className="flex mt-[75px]">
@@ -222,7 +222,7 @@ const Signup: React.FC = () => {
       </div>
 
       {/* OTP POPUP */}
-      {otpPopup && (
+     {/*  {otpPopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-white rounded-xl shadow-lg shadow-gray-500/75 p-8 w-[460px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Verify OTP</h2>
@@ -249,7 +249,7 @@ const Signup: React.FC = () => {
             </button>
           </div>
         </div>
-      )}
+      )}*/}
     </div>
   );
 };
