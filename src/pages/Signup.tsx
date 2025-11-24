@@ -59,7 +59,7 @@ const Signup: React.FC = () => {
 
     try {
       // 1️⃣ Signup API
-      const res = await axios.post("http://localhost:3000/Auth/Signup", {
+      const res = await axios.post("https://backend-96gl.onrender.com/Auth/Signup", {
         username: data.fullName,
         email: data.email,
         password: data.password,
@@ -90,7 +90,7 @@ const Signup: React.FC = () => {
   // ---------------------------
   const handleVerifyOtp = async () => {
     try {
-      const res = await axios.post("http://localhost:3000/Auth/otp", {
+      const res = await axios.post("https://backend-96gl.onrender.com/Auth/otp", {
         email: userEmail,
         username:username,
         otp: otp,
