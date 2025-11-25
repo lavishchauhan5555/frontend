@@ -12,7 +12,7 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <h1 className="text-4xl lg:text-6xl font-extrabold leading-tight">
-                AI-Powered Study Assistant for Smarter Exam Preparation
+                AI-Powered Study Assistant for Smarter Exam Preparation with us.
               </h1>
               <p className="mt-6 text-lg opacity-90">
                 Upload PDFs, notes, textbooks, or videos — get instant
