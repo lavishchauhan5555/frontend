@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {images} from '../assets/images' 
 import { Link } from "react-router-dom";
+import api from '../api/axios'
 
 // Define Yup schema
 const schema = yup.object({

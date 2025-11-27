@@ -6,6 +6,7 @@ import * as yup from "yup";
 import axios from "axios";
 import { images } from "../assets/images";
 import { Link } from "react-router-dom";
+import api from '../api/axios'
 
 // Validation schema
 const schema = yup.object({
@@ -59,7 +60,7 @@ const Signup: React.FC = () => {
 
     try {
       // 1️⃣ Signup API
-      const res = await axios.post("http://localhost:3000/Auth/signup", {
+      const res = await api.post('/signup', {
         username: data.fullName,
         email: data.email,
         password: data.password,
