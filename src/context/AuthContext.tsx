@@ -28,21 +28,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   const login = async (email: string, password: string) => {
-    const res = await api.post('/auth/login', { email, password });
+    const res = await api.post('/login', { email, password });
     const data = res.data as any;
     setAccessToken(data.accessToken);
     setUser(data.user);
   };
 
   const logout = async () => {
-    await api.post('/auth/logout');
+    await api.post('/logout');
     setAccessToken(null);
     setUser(null);
   };
 
   const refresh = async () => {
     try {
-      const res = await api.post('/auth/refresh');
+      const res = await api.post('/refresh');
       const data = res.data as any;
       setAccessToken(data.accessToken);
       setUser(data.user);
@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (getAccessToken()) {
         refresh();
       }
-    }, 10 * 60 * 1000);
+    }, 2 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);

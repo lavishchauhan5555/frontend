@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {images} from '../assets/images' 
 import { Link } from "react-router-dom";
-import api from '../api/axios'
+import {useAuth } from '../context/AuthContext'
 
 // Define Yup schema
 const schema = yup.object({
@@ -16,14 +16,21 @@ const schema = yup.object({
 type FormData = yup.InferType<typeof schema>;
 
 const Login: React.FC = () => {
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form Data:", data);
+  const onSubmit = async(data: FormData) => {
+     try {
+      await login(data.email, data.password);
+      // navigate("/dashboard"); // after login go to dashboard
+    } catch (err) {
+      alert("Invalid email/password");
+      console.error(err);
+    }
   };
 
   return (
