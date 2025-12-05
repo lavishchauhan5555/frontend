@@ -1,99 +1,166 @@
-import Navbar from "../pages/Navbar";
-import Footer from "../pages/Footer";
+import React, { useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { images } from "../assets/images";
+interface FileData {
+  file: File;
+  preview: string;
+}
 
-export default function LandingPage() {
+export default function Landingpage() {
+  const [text, setText] = useState("");
+  const [files, setFiles] = useState<FileData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState("");
+
+  const onDrop = (acceptedFiles: File[]) => {
+    const mappedFiles = acceptedFiles.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setFiles((prev) => [...prev, ...mappedFiles]);
+  };
+
+  const { getRootProps, getInputProps, open } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [],
+      "application/pdf": [],
+    },
+    noClick: true,
+    noKeyboard: true,
+  });
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const sendRequest = async () => {
+    if (!text.trim() && files.length === 0) return;
+
+    setLoading(true);
+
+    const base64Files = await Promise.all(
+      files.map(async (f) => ({
+        name: f.file.name,
+        type: f.file.type,
+        data: await fileToBase64(f.file),
+      }))
+    );
+
+    const payload = { text, files: base64Files };
+
+    const res = await fetch("http://localhost:5000/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    setResponse(data.reply || "");
+
+    setText("");
+    setFiles([]);
+    setLoading(false);
+  };
+
+  // ➤ Send on Enter Key
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendRequest();
+    }
+  };
+
   return (
-    <>
-   
+    <div className=" relative min-h-screen bg-[#ffffff] flex flex-col items-center " {...getRootProps()}>
+      <input {...getInputProps()} />
 
-      <div className="min-h-screen bg-white text-gray-900">
-        {/* Hero Section */}
-        <header className="w-full py-16 px-6 lg:px-20 bg-linear-to-b from-blue-600 to-blue-500 text-white">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <h1 className="text-4xl lg:text-6xl font-extrabold leading-tight">
-                AI-Powered Study Assistant for Smarter Exam Preparation with us.
-              </h1>
-              <p className="mt-6 text-lg opacity-90">
-                Upload PDFs, notes, textbooks, or videos — get instant
-                summaries, quizzes, flashcards, and an AI tutor.
-              </p>
+      <div className="mt-3 flex justify-between  items-center w-[94vw]">
+        <div className="text-[20px] font-medium text-[#444746]">AI TWIN</div>
+        <div>
+          <img className="w-10 h-10  rounded-full border-[0.5px] border-gray-300" src="" alt="" />
+        </div>
+      </div>
 
-              <div className="mt-8 flex gap-4">
-                <button className="px-6 py-3 rounded-2xl bg-white text-blue-600 font-semibold shadow-md hover:shadow-lg">
-                  Get Started Free
-                </button>
-                <button className="px-6 py-3 rounded-2xl border border-white font-semibold hover:bg-white hover:text-blue-600 transition">
-                  Watch Demo
-                </button>
+      {/* File Preview */}
+      {files.length > 0 && (
+        <div className="w-full max-w-3xl mb-4 p-4 bg-white rounded-xl shadow">
+          <h2 className="font-semibold mb-2">Files</h2>
+          <div className="flex gap-4 flex-wrap">
+            {files.map((f, i) => (
+              <div key={i} className="border p-2 rounded-lg">
+                {f.file.type.includes("pdf") ? (
+                  <p className="text-sm">📄 {f.file.name}</p>
+                ) : (
+                  <img src={f.preview} className="w-24 h-24 object-cover rounded" />
+                )}
               </div>
-            </div>
-
-            <div className="flex justify-center">
-              <img
-                src="https://i.imgur.com/8Y2xXcP.png"
-                alt="AI Study Banner"
-                className="w-full max-w-md rounded-3xl shadow-2xl"
-              />
-            </div>
+            ))}
           </div>
-        </header>
+        </div>
+      )}
 
-        {/* Features Section */}
-        <section className="py-20 px-6 lg:px-20 bg-gray-50">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold">
-              Everything You Need To Study Smarter
-            </h2>
-            <p className="mt-4 text-gray-600 text-lg">
-              Transform your notes into a complete exam preparation toolkit.
-            </p>
-
-            <div className="grid md:grid-cols-3 gap-10 mt-14">
-              <div className="p-8 bg-white rounded-3xl shadow hover:shadow-xl transition">
-                <h3 className="text-xl font-semibold">Auto Summaries</h3>
-                <p className="mt-3 text-gray-600">
-                  Get summaries from your PDFs.
-                </p>
-              </div>
-
-              <div className="p-8 bg-white rounded-3xl shadow hover:shadow-xl transition">
-                <h3 className="text-xl font-semibold">MCQs & Quizzes</h3>
-                <p className="mt-3 text-gray-600">AI-generated questions.</p>
-              </div>
-
-              <div className="p-8 bg-white rounded-3xl shadow hover:shadow-xl transition">
-                <h3 className="text-xl font-semibold">Flashcards (SRS)</h3>
-                <p className="mt-3 text-gray-600">Smart spaced repetition.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* AI Tutor */}
-        <section className="py-20 px-6 lg:px-20">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 items-center gap-12">
+      {/* Input Area */}
+      <div className=" absolute w-full max-w-[680px]   flex flex-col  bottom-[300px]">
+        <div className="w-full border-[1.5px]  border-gray-400/50  rounded-2xl p-1  shadow-[0_6px_20px_rgba(0,0,0,0.12)]
+ min-h-[100px]">
+          <textarea
+            className="w-full px-4 pt-2 focus:outline-none focus:ring-0"
+            placeholder="Write something or upload files..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <div className="flex items-center justify-between  px-2">
+            {/* Upload Button */}
             <div>
-              <h2 className="text-3xl font-bold">Your Personal AI Tutor</h2>
-              <p className="mt-4 text-gray-600 text-lg">
-                Ask any question and get answers grounded from your uploaded
-                documents.
-              </p>
-              <button className="mt-6 px-6 py-3 rounded-2xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700">
-                Try AI Tutor
+              <button
+                onClick={open}
+                className="p-2 cursor-pointer"
+                title="Upload file"
+              >
+                <img src={images.upload} alt="" />
+              </button>
+
+              {/* Audio/Mic Button */}
+              <button className="p-2   cursor-pointer" title="Voice Input">
+               <img src={images.mic} alt="" />
+              </button>
+            </div>
+            <div>
+              {/* Send Button (Up Arrow SVG) */}
+              <button
+                disabled={loading}
+                onClick={sendRequest}
+                className="p-3  rounded-full cursor-pointer "
+                title="Send"
+              >
+                <img className="w-8 h-8" src={images.upwordarrow} alt="" />
               </button>
             </div>
 
-            <img
-              src="https://i.imgur.com/I4z3LSl.png"
-              alt="AI Tutor"
-              className="rounded-3xl shadow-xl"
-            />
+
+
           </div>
-        </section>
+        </div>
+
+
+        {/* Bottom Bar: Upload, Mic, Send */}
+
       </div>
 
-    
-    </>
+      {/* Response */}
+      {response && (
+        <div className="w-full max-w-3xl mt-6 p-4 bg-white rounded-xl shadow">
+          <h2 className="font-semibold mb-2">AI Response</h2>
+          <p className="whitespace-pre-line">{response}</p>
+        </div>
+      )}
+    </div>
   );
 }
